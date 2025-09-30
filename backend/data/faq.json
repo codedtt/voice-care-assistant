@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "doc_id": "Returns Policy",
+    "question": "What is your general return policy?",
+    "answer": "We accept returns for items within 30 days of purchase, provided the items are unused and in their original packaging. Custom-made items are non-refundable."
+  },
+  {
+    "id": "2",
+    "doc_id": "Returns Policy",
+    "question": "How do I start a return?",
+    "answer": "To initiate a return, please visit our online Return Center and enter your order number and email address. You will receive a prepaid shipping label."
+  },
+  {
+    "id": "3",
+    "doc_id": "Shipping Info",
+    "question": "What are your shipping costs?",
+    "answer": "Standard shipping is free for all orders over $50. For orders under $50, a flat rate of $5.99 applies. Expedited shipping options are available at checkout."
+  },
+  {
+    "id": "4",
+    "doc_id": "Warranty",
+    "question": "Is there a warranty on electronics?",
+    "answer": "All electronics come with a standard 1-year limited warranty covering manufacturing defects. This warranty does not cover accidental damage."
+  },
+  {
+    "id": "5",
+    "doc_id": "Account Changes",
+    "question": "How can I update my shipping address?",
+    "answer": "You can change your shipping address through your account dashboard under 'My Addresses'. Note that the address cannot be changed after an order has shipped."
+  },
+  {
+    "id": "6",
+    "doc_id": "Returns Policy",
+    "question": "Can I return a final sale item?",
+    "answer": "Items marked as 'Final Sale' are not eligible for returns, exchanges, or refunds, as stated clearly on the product page."
+  },
+  {
+    "id": "7",
+    "doc_id": "Shipping Info",
+    "question": "Do you ship internationally?",
+    "answer": "Yes, we ship to over 100 countries. International shipping rates and times vary by destination and are calculated at checkout."
+  },
+  {
+    "id": "8",
+    "doc_id": "Payments",
+    "question": "What payment methods do you accept?",
+    "answer": "We accept Visa, Mastercard, American Express, PayPal, and Google Pay."
+  }
+]
