@@ -41,12 +41,6 @@ npm run ingest
 ```
 ⚙️ Environment Variables
 The project requires you to create a backend/.env file to securely store all necessary API keys and configuration settings.
-
-GEMINI_API_KEY	Your Google AI Studio API Key.
-PINECONE_API_KEY	Your Pinecone API Key.
-PINECONE_INDEX	The name of the Pinecone index used by the RAG system.	faq-index
-PORT	The local port the backend API server will run on.	3000
-
 4. Example backend/.env contents:
 ```bash
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
