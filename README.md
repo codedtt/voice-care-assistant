@@ -41,6 +41,7 @@ npm run ingest
 ```
 ⚙️ Environment Variables
 The project requires you to create a backend/.env file to securely store all necessary API keys and configuration settings.
+
 4. Example backend/.env contents:
 ```bash
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
