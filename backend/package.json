@@ -4,9 +4,9 @@
   "description": "Backend for Voice Care Assistant using RAG and Intent Routing",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
-    "start:server": "npm run build && node -r dotenv/config ./dist/server.js",
-    "ingest": "npm run build && node -r dotenv/config ./dist/ingest.js"
+    "build": "npm exec tsc",
+    "start:server": "node -r dotenv/config ./dist/server.js",
+    "ingest": "npm exec tsc && node -r dotenv/config ./dist/ingest.js"
   },
   "keywords": [
     "rag",
