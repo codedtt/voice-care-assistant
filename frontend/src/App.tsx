@@ -15,7 +15,7 @@ interface Message {
 }
 
 // --- CONFIGURATION ---
-const BACKEND_API_URL = 'http://localhost:3000/api/query';
+const BACKEND_API_URL = 'https://voice-care-assistant.onrender.com/api/query';
 
 // --- GLOBAL INTERFACE DECLARATIONS (STT/TTS) ---
 interface SpeechRecognitionAlternative {
