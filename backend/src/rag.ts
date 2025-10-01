@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { queryPinecone } from "./vectorStores/pineconeStore.ts";
-import { getOrderStatus } from "./orderStub.ts";
-import { getProductInfo } from "./productInfo.ts";
+import { queryPinecone } from "./vectorStores/pineconeStore.js";
+import { getOrderStatus } from "./orderStub.js";
+import { getProductInfo } from "./productInfo.js";
 
 // Initialize Gemini Client
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
