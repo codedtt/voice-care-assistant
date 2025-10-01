@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
-import { processQuery } from './rag.ts'; 
-import type { BotResponse } from './rag.ts';
+import { processQuery } from './rag.js'; 
+import type { BotResponse } from './rag.js';
 
 // --- Configuration ---
 const app = express();
