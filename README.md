@@ -64,6 +64,7 @@ npm run start:server
 2. Start the Frontend Application:
 The client typically runs on port 5173.
 ```bash
+cd ./frontend
 npm run dev
 ```
 
