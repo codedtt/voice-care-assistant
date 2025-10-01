@@ -2,7 +2,7 @@
 
 This project implements a full-stack, voice-enabled assistant that answers user questions by performing Retrieval-Augmented Generation (RAG) against a private FAQ knowledge base hosted on Pinecone. It also handles specific user intents (e.g., "Order Status") by calling a mock API.
 
-The solution is built as a monorepo with a Node.js/Express backend (for RAG logic and security) and a React/Vite frontend (for the voice interface).
+The solution is built as a monorepo with a Node.js/Express/Typescript backend (for RAG logic and security) and a React/Vite frontend (for the voice interface).
 
 🚀 Quick Setup (<15 Minutes)
 Follow these steps to get the assistant running on your local machine.
