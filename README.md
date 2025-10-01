@@ -9,7 +9,7 @@ Follow these steps to get the assistant running on your local machine.
 
 1. Clone the Repository:
 ```bash
-git clone [[REPO]](https://github.com/codedtt/voice-care-assistant) voice-care-assistant
+git clone https://github.com/codedtt/voice-care-assistant
 cd voice-care-assistant
 ```
 2. Install Dependencies (Backend & Frontend):
