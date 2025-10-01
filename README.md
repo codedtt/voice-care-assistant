@@ -13,7 +13,6 @@ git clone https://github.com/codedtt/voice-care-assistant
 cd voice-care-assistant
 ```
 2. Install Dependencies (Backend & Frontend):
-3. 
 # Install backend dependencies (Node/Express, RAG libraries)
 ```bash
 cd backend
@@ -36,8 +35,10 @@ See the section below for details on setting your API keys.
 4. Ingest Knowledge Base Data:
 This script creates or updates the faq-index in Pinecone with your FAQ data.
 # Run the ingestion script from the backend directory
-npm run ingest --prefix backend
-
+```bash
+cd ./backend
+npm run ingest
+```
 ⚙️ Environment Variables
 The project requires you to create a backend/.env file to securely store all necessary API keys and configuration settings.
 
