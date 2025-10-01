@@ -11,14 +11,13 @@ interface Source {
 interface Message {
     role: 'user' | 'bot';
     text: string;
-    sources?: Source[]; // Added optional sources for grounded responses
+    sources?: Source[];
 }
 
 // --- CONFIGURATION ---
 const BACKEND_API_URL = 'http://localhost:3000/api/query';
 
 // --- GLOBAL INTERFACE DECLARATIONS (STT/TTS) ---
-// We must declare these types as they are experimental and not standard in TypeScript lib.dom
 interface SpeechRecognitionAlternative {
     readonly transcript: string;
     readonly confidence: number;
@@ -76,7 +75,6 @@ const SpeechRecognitionClass = (window.SpeechRecognition || window.webkitSpeechR
 
 let recognition: SpeechRecognition | null = null;
 if (SpeechRecognitionClass) {
-    // Explicitly cast the instance to the declared interface
     recognition = new SpeechRecognitionClass(); 
     recognition.continuous = false; 
     recognition.interimResults = false;
@@ -88,7 +86,6 @@ const App: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([
         {
             role: 'bot',
-            // Updated initial message to include 'product details'
             text: "Hello! I'm your AI care assistant. Ask me about returns, shipping, order status, or product details.",
         },
     ]);
@@ -150,7 +147,6 @@ const App: React.FC = () => {
         const startTime = performance.now(); 
 
         try {
-            // In a real app, this should match QueryResponse
             const response = await axios.post<QueryResponse>(BACKEND_API_URL, { query: queryText });
             const botAnswer = response.data.answer;
             let botSources = response.data.sources || [];
@@ -219,14 +215,12 @@ const App: React.FC = () => {
             const lastResult = event.results[event.results.length - 1];
             const transcript = lastResult[0].transcript;
 
-            // We must use the state setter here since this is an async callback
             setTempTranscript(transcript); 
 
             if (lastResult.isFinal) {
                 recognition!.stop();
                 setIsListening(false);
                 setTempTranscript('');
-                // Use a stable reference to the query processing logic
                 processUserQuery(transcript);
             }
         };

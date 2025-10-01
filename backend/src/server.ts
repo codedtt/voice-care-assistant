@@ -1,18 +1,16 @@
 import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
-// Imports the function and the type from rag.ts (which now uses 'export type BotResponse')
 import { processQuery } from './rag.ts'; 
 import type { BotResponse } from './rag.ts';
 
 // --- Configuration ---
 const app = express();
-// Setting back to 3000 as per common practice
 const port = process.env.PORT || 3000; 
 
 // Middleware setup
-app.use(cors()); // Allow cross-origin requests from the frontend
-app.use(express.json()); // Enable parsing of JSON bodies
+app.use(cors());
+app.use(express.json());
 
 
 /**
@@ -30,11 +28,8 @@ app.post('/api/query', async (req: Request, res: Response<BotResponse | { error:
     console.log(`\n[Server] Received query: "${query}"`);
 
     try {
-        // Use the router to handle RAG or Order Status
         const response: BotResponse = await processQuery(query);
         console.log(`[Server] Response Intent: ${response.intent}`);
-        
-        // Return the final response object { answer, intent }
         return res.json(response); 
         
     } catch (error) {

@@ -99,7 +99,7 @@ export async function queryPinecone(query: string): Promise<string[]> {
         // 2. Query Pinecone
         const queryResult = await index.query({
             vector: queryEmbedding,
-            topK: 8, // Increase topK to search all mock vectors
+            topK: 8,
             includeMetadata: true,
         });
 
@@ -174,12 +174,10 @@ export async function queryPinecone(query: string): Promise<string[]> {
         
         const finalAnswer = response.text.trim();
         console.log(`[RAG] Final Answer Generated: ${finalAnswer}`);
-        // Return the final answer wrapped in an array, as expected by the caller (rag.ts)
         return [finalAnswer];
 
     } catch (error) {
         console.error("❌ Error during RAG pipeline execution (Pinecone/Mock/Gemini):", error);
-        // Re-throw the error so the caller (rag.ts) can catch it and execute queryFaissFallback.
         throw error;
     }
 }

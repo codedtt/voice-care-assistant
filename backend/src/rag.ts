@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { queryPinecone } from "./vectorStores/pineconeStore.ts";
-import { getOrderStatus } from "./orderStub.ts"; // Corrected path to orderStub
-import { getProductInfo } from "./productInfo.ts"; // NEW: Import product stub
+import { getOrderStatus } from "./orderStub.ts";
+import { getProductInfo } from "./productInfo.ts";
 
 // Initialize Gemini Client
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
@@ -12,7 +12,6 @@ if (!GEMINI_API_KEY) {
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY! });
     
 // Define the structure for the API response and EXPORT IT
-// UPDATED: Added 'Product_Info' to the possible intents
 export type BotResponse = {
     answer: string;
     intent: 'General' | 'RAG' | 'Order_Status' | 'Product_Info';
@@ -24,7 +23,6 @@ export type BotResponse = {
  * @returns The determined intent and any extracted details (like an order ID or product name).
  */
 async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_Status' | 'Product_Info', details: string }> {
-    // UPDATED PROMPT: Included rule for Product_Info
     const prompt = `Analyze the following user query and classify the intent.
     
     1. If the user is asking about an **order status**, tracking, or has mentioned a specific order ID (which usually contains letters and numbers, like 'ABC12345'), the intent is 'Order_Status'.
@@ -45,34 +43,25 @@ async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_
             model: 'gemini-2.5-flash',
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             config: {
-                // Force JSON output
                 responseMimeType: "application/json",
                 responseSchema: {
-                    // FIX: Use the imported Type enum instead of the string literal "OBJECT"
                     type: Type.OBJECT, 
                     properties: {
-                        // UPDATED: Added 'Product_Info' to the enum
                         intent: { type: Type.STRING, enum: ["RAG", "Order_Status", "Product_Info"] }, 
-                        details: { type: Type.STRING } // Renamed from orderId to generic details
+                        details: { type: Type.STRING }
                     },
                 },
             },
         });
 
         const jsonText = response.text;
-        
-        // FIX: Ensure jsonText is a defined string before parsing
         if (!jsonText) {
             throw new Error("Gemini API returned no text content for intent detection.");
         }
         
         const result = JSON.parse(jsonText);
-        
-        // FIX: Added fallback to result.orderId (a legacy field name) to handle cases 
-        // where the model does not strictly adhere to the 'details' field.
         const extractedDetails = result.details || result.orderId || '';
 
-        // Use generic 'details' property which can hold either order ID or product name
         console.log(`[Intent Detection] Intent: ${result.intent}, Details: ${extractedDetails}`);
 
         return { 

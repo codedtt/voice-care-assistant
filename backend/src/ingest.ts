@@ -7,7 +7,7 @@ import * as path from 'path';
 // --- CONFIGURATION ---
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 const PINECONE_INDEX = process.env.PINECONE_INDEX || "faq-index";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // Required for Google embeddings
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const DATA_PATH = path.join(process.cwd(), 'data', 'faq.json');
 const EMBEDDING_MODEL = 'embedding-001';
 const EMBEDDING_DIMENSION = 768; // Dimension for embedding-001
@@ -66,8 +66,6 @@ async function generateGoogleEmbedding(text: string): Promise<number[]> {
             // Generate mock vector for the current failed call
             return Array.from({ length: EMBEDDING_DIMENSION }, () => Math.random() - 0.5);
         }
-        
-        // Re-throw any other unexpected error
         throw error;
     }
 }
@@ -104,8 +102,6 @@ async function ingestData() {
                     console.log('Deletion successful. Waiting for cleanup...');
                     // Wait longer (10s) for the index to fully delete before recreating
                     await new Promise(resolve => setTimeout(resolve, 10000)); 
-
-                    // indexNeedsCreation remains true
                 }
             } catch (describeError: any) {
                 // Handle case where describeIndex fails (e.g., index is currently being deleted/recreated)

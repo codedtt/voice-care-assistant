@@ -8,9 +8,6 @@
 export async function queryFaissFallback(query: string): Promise<string[]> {
     const errorDetails = "I encountered a high-traffic issue with my main knowledge base server.";
     const helpfulMessage = "I can still provide some basic guidance, but for detailed policy information, please check our help page.";
-    
-    // The response must be an array of strings (context chunks).
-    // We'll return a mock context that tells the user the source is local.
     const fallbackContext = `${errorDetails} ${helpfulMessage} (Source: Local FAISS Fallback for query: ${query}).`;
 
     return [fallbackContext]; 

@@ -47,8 +47,6 @@ export function getOrderStatus(orderId: string): string {
     }
 
     const { status, trackingNumber, deliveryDate } = statusData;
-    
-    // Format the response message
     let message = `The status for your order **${orderId.toUpperCase()}** is currently **${status}**.`;
 
     if (status === 'Shipped') {

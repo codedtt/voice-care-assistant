@@ -12,7 +12,6 @@ interface ProductDetails {
 }
 
 // Define the specific structure of the product catalog, mapping literal keys to the ProductDetails structure.
-// This is the key to resolving the indexing error.
 interface ProductCatalog {
     'pro suite': ProductDetails;
     'basic plan': ProductDetails;
@@ -41,13 +40,11 @@ export function getProductInfo(productName: string): string {
         }
     };
 
-    // Get the keys and assert their type to inform TypeScript that they are safe to use for indexing.
     const productKeys = Object.keys(productData) as (keyof ProductCatalog)[];
 
     const productKey = productKeys.find(key => normalizedName.includes(key) || key.includes(normalizedName));
 
     if (productKey) {
-        // TypeScript now knows 'productKey' is a valid key for 'productData'.
         const product = productData[productKey];
         return `${product.name} details: ${product.details} Current Availability: ${product.availability}`;
     } else {
