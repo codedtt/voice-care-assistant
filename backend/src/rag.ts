@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { queryPinecone } from "./vectorStores/pineconeStore.ts";
 import { getOrderStatus } from "./orderStub.ts"; // Corrected path to orderStub
+import { getProductInfo } from "./productInfo.ts"; // NEW: Import product stub
 
 // Initialize Gemini Client
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
@@ -11,29 +12,32 @@ if (!GEMINI_API_KEY) {
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY! });
     
 // Define the structure for the API response and EXPORT IT
-// NOTE: Converted interface to type alias to force cache refresh/update on the file.
+// UPDATED: Added 'Product_Info' to the possible intents
 export type BotResponse = {
     answer: string;
-    intent: 'General' | 'RAG' | 'Order_Status';
+    intent: 'General' | 'RAG' | 'Order_Status' | 'Product_Info';
 };
 
 /**
- * Uses a small, fast model to determine the user's intent: RAG or Order_Status.
+ * Uses a small, fast model to determine the user's intent.
  * @param query The user's question.
- * @returns The determined intent and any extracted details (like an order ID).
+ * @returns The determined intent and any extracted details (like an order ID or product name).
  */
-async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_Status', details: string }> {
+async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_Status' | 'Product_Info', details: string }> {
+    // UPDATED PROMPT: Included rule for Product_Info
     const prompt = `Analyze the following user query and classify the intent.
     
     1. If the user is asking about an **order status**, tracking, or has mentioned a specific order ID (which usually contains letters and numbers, like 'ABC12345'), the intent is 'Order_Status'.
-    2. For all other questions (FAQs, policy inquiries, general chat), the intent is 'RAG'.
+    2. If the user is asking specifically about **product features, specifications, availability, or pricing of a product**, the intent is 'Product_Info'.
+    3. For all other questions (FAQs, policy inquiries, general chat), the intent is 'RAG'.
     
     If the intent is 'Order_Status', extract the 5-8 character order ID. If no order ID is found, use 'None'.
+    If the intent is 'Product_Info', extract the main product name (e.g., "Pro Suite", "Monitor X"). If no specific product is mentioned, use 'General'.
     
     User Query: "${query}"
     
     Respond STRICTLY in JSON format:
-    {"intent": "RAG" | "Order_Status", "orderId": "ExtractedOrderID | None"}`;
+    {"intent": "RAG" | "Order_Status" | "Product_Info", "details": "ExtractedID/ProductName | None | General"}`;
 
     try {
         // Using gemini-2.5-flash for fast and accurate structured intent routing
@@ -47,8 +51,9 @@ async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_
                     // FIX: Use the imported Type enum instead of the string literal "OBJECT"
                     type: Type.OBJECT, 
                     properties: {
-                        intent: { type: Type.STRING, enum: ["RAG", "Order_Status"] },
-                        orderId: { type: Type.STRING }
+                        // UPDATED: Added 'Product_Info' to the enum
+                        intent: { type: Type.STRING, enum: ["RAG", "Order_Status", "Product_Info"] }, 
+                        details: { type: Type.STRING } // Renamed from orderId to generic details
                     },
                 },
             },
@@ -63,11 +68,16 @@ async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_
         
         const result = JSON.parse(jsonText);
         
-        console.log(`[Intent Detection] Intent: ${result.intent}, Order ID: ${result.orderId}`);
+        // FIX: Added fallback to result.orderId (a legacy field name) to handle cases 
+        // where the model does not strictly adhere to the 'details' field.
+        const extractedDetails = result.details || result.orderId || '';
+
+        // Use generic 'details' property which can hold either order ID or product name
+        console.log(`[Intent Detection] Intent: ${result.intent}, Details: ${extractedDetails}`);
 
         return { 
             intent: result.intent, 
-            details: result.orderId !== 'None' ? result.orderId : ''
+            details: extractedDetails
         };
 
     } catch (error) {
@@ -84,17 +94,39 @@ async function determineIntent(query: string): Promise<{ intent: 'RAG' | 'Order_
  */
 export async function processQuery(query: string): Promise<BotResponse> {
     try {
-        const { intent, details: orderId } = await determineIntent(query);
+        // Renamed orderId to generic details for holding either ID or Product Name
+        const { intent, details } = await determineIntent(query);
+
+        // --- Intent: Order Status (API Call) ---
+        // Determine the ID to use: only if the details are truthy and not 'None'.
+        const orderId = (details && details !== 'None') ? details : null;
 
         if (intent === 'Order_Status' && orderId) {
-            // --- Intent: Order Status (API Call) ---
             const answer = getOrderStatus(orderId);
             return {
                 answer,
                 intent: 'Order_Status'
             };
-        } else if (intent === 'RAG' || intent === 'Order_Status') { // Handle RAG intent or a failed Order_Status intent (no ID found)
-            // --- Intent: RAG (Default) ---
+        } 
+        
+        // --- NEW INTENT: Product Info (API Call) ---
+        // If the intent is Product_Info, and the details are NOT explicitly 'General' (our RAG fallback value for product),
+        // we route it to the dedicated function.
+        if (intent === 'Product_Info' && details !== 'General') {
+             // Determine what to pass to the ProductInfo stub. 
+             // If details extraction failed (details is empty or 'None'), pass the entire query for the stub to try and parse.
+             const productIdentifier = (details && details !== 'None') ? details : query; 
+             
+            const answer = getProductInfo(productIdentifier);
+            return {
+                answer,
+                intent: 'Product_Info'
+            };
+        }
+        
+        // --- Intent: RAG (Default) ---
+        // This handles RAG, or fallbacks from failed Order_Status/Product_Info (e.g., missing ID, non-specific product query, or 'General' product query)
+        if (intent === 'RAG' || intent === 'Order_Status' || intent === 'Product_Info') { 
             // queryPinecone returns the synthesized answer as the first element of the tuple
             const [ragAnswer] = await queryPinecone(query);
             return {

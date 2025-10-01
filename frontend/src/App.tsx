@@ -88,7 +88,8 @@ const App: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([
         {
             role: 'bot',
-            text: "Hello! I'm your AI care assistant. Ask me about returns, shipping, or your order status.",
+            // Updated initial message to include 'product details'
+            text: "Hello! I'm your AI care assistant. Ask me about returns, shipping, order status, or product details.",
         },
     ]);
     const [isListening, setIsListening] = useState(false);
@@ -139,8 +140,14 @@ const App: React.FC = () => {
     const processUserQuery = async (queryText: string) => {
         if (!queryText.trim()) return;
 
+        // 1. Logging: Log user query
+        console.log(`[LOG] User Query: "${queryText}"`);
+
         setMessages((prev) => [...prev, { role: 'user', text: queryText }]);
         setIsTyping(true);
+
+        // 2. Latency Measurement: Start timing
+        const startTime = performance.now(); 
 
         try {
             // In a real app, this should match QueryResponse
@@ -148,7 +155,16 @@ const App: React.FC = () => {
             const botAnswer = response.data.answer;
             let botSources = response.data.sources || [];
 
-            // --- MOCK CITATION DATA FOR DEMO ---
+            // 2. Latency Measurement: End timing and log
+            const endTime = performance.now();
+            const latency = (endTime - startTime).toFixed(2);
+            console.log(`[LOG] API Latency: ${latency} ms`);
+            
+            // 1. Logging: Log bot response
+            console.log(`[LOG] Bot Response: "${botAnswer}"`);
+
+
+            // --- MOCK CITATION DATA FOR DEMO + NEW INTENT ---
             if (botSources.length === 0) {
                  if (queryText.toLowerCase().includes('order')) {
                     botSources = [{ 
@@ -156,12 +172,18 @@ const App: React.FC = () => {
                         title: "Order Tracking System v2.1" 
                     }];
                  } else if (queryText.toLowerCase().includes('return')) {
-                     botSources = [{ 
+                    botSources = [{ 
                         uri: "https://example.com/returns-policy", 
                         title: "Customer Returns & Refunds Policy" 
                     }];
+                 // 3. New Intent: Product Info/Details
+                 } else if (queryText.toLowerCase().includes('product') || queryText.toLowerCase().includes('details')) { 
+                    botSources = [{ 
+                        uri: "https://example.com/product-catalog/sku-42", 
+                        title: "Detailed Product Specifications for SKU-42" 
+                    }];
                  } else {
-                     botSources = [{
+                    botSources = [{
                         uri: "https://example.com/knowledge-base/general-faq",
                         title: "Company General FAQ"
                     }];
@@ -172,7 +194,11 @@ const App: React.FC = () => {
             setMessages((prev) => [...prev, { role: 'bot', text: botAnswer, sources: botSources }]);
             speak(botAnswer);
         } catch (error) {
-            console.error('Backend API call failed:', error);
+            // Log error with latency even on failure
+            const endTime = performance.now();
+            const latency = (endTime - startTime).toFixed(2);
+            console.error(`[LOG] Backend API call failed (Latency: ${latency} ms):`, error); 
+            
             const errorMessage =
                 "Sorry, I'm having trouble connecting to my knowledge base. Please ensure the backend server is running.";
             setMessages((prev) => [...prev, { role: 'bot', text: errorMessage }]);
@@ -527,7 +553,7 @@ const App: React.FC = () => {
                                 synth.cancel(); // Stop speaking on clear
                                 setMessages([{
                                     role: 'bot',
-                                    text: "Hello! I'm your AI care assistant. Ask me about returns, shipping, or your order status.",
+                                    text: "Hello! I'm your AI care assistant. Ask me about returns, shipping, order status, or product details.",
                                 }]);
                             }}
                             style={{
