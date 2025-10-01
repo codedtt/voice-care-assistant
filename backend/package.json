@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google/genai": "0.0.5",
+   "@google/genai": "github:googleapis/nodejs-genai",
     "@pinecone-database/pinecone": "^2.1.0",
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
